@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PyDuino Image Understand</title>
+    <style>
+      :root {
+        --bg-0: #f7fff9;
+        --bg-1: #ffffff;
+        --bg-2: #eaf9f0;
+        --green-0: #1f8f4a;
+        --green-1: #40c463;
+        --green-2: #1f5a37;
+        --green-3: #2c6f45;
+        --ink-0: #0c2a16;
+        --ink-1: #19452b;
+        --card: rgba(255, 255, 255, 0.9);
+        --stroke: #d8efe1;
+        --shadow: 0 18px 45px rgba(12, 42, 22, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+        color: var(--ink-0);
+        background:
+          radial-gradient(900px 420px at 15% -10%, #d8ffe7 0%, transparent 55%),
+          radial-gradient(900px 420px at 100% 0%, #e8fff1 0%, transparent 65%),
+          linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+      }
+
+      .noise {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.08;
+        mix-blend-mode: multiply;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.7'/></svg>");
+        z-index: 0;
+      }
+
+      header {
+        position: relative;
+        z-index: 2;
+        padding: 56px 6vw 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-weight: 700;
+        color: var(--green-2);
+        letter-spacing: 0.5px;
+      }
+
+      .brand-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #15b365, #67e18b);
+        display: grid;
+        place-items: center;
+        color: white;
+        font-weight: 800;
+        box-shadow: 0 10px 20px rgba(31, 143, 74, 0.25);
+      }
+
+      .hero {
+        position: relative;
+        z-index: 2;
+        padding: 24px 6vw 80px;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        align-items: center;
+      }
+
+      .hero-card {
+        background: var(--card);
+        border: 1px solid var(--stroke);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(6px);
+      }
+
+      .title {
+        font-size: clamp(2rem, 3vw, 3.1rem);
+        line-height: 1.05;
+        margin: 0 0 12px;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        color: var(--ink-1);
+        margin: 0 0 22px;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .btn {
+        border: none;
+        cursor: pointer;
+        padding: 12px 22px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.98rem;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(120deg, var(--green-0), var(--green-1));
+        color: white;
+        box-shadow: 0 14px 30px rgba(31, 143, 74, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f0fbf4;
+        color: var(--green-2);
+        border: 1px solid #bfe6cd;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .hero-panel {
+        display: grid;
+        gap: 16px;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid #d8efe1;
+        border-radius: 20px;
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .meter {
+        background: #e9f7ee;
+        border-radius: 999px;
+        height: 10px;
+        overflow: hidden;
+      }
+
+      .meter > span {
+        display: block;
+        height: 100%;
+        width: 62%;
+        background: linear-gradient(90deg, #1f8f4a, #40c463);
+        border-radius: 999px;
+        animation: fill 2.8s ease-in-out infinite alternate;
+      }
+
+      @keyframes fill {
+        0% { width: 35%; }
+        100% { width: 88%; }
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill {
+        background: #ffffff;
+        border: 1px solid #d8efe1;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        color: var(--green-3);
+      }
+
+      .feature-grid {
+        padding: 0 6vw 80px;
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      }
+
+      .feature {
+        background: var(--card);
+        border: 1px solid var(--stroke);
+        border-radius: 18px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 24px rgba(12, 42, 22, 0.08);
+      }
+
+      .feature h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .feature p {
+        margin: 0;
+        color: #2f6040;
+        font-size: 0.92rem;
+      }
+
+      footer {
+        padding: 24px 6vw 46px;
+        color: #2b6040;
+        font-size: 0.85rem;
+      }
+
+      .floating-orb {
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        filter: blur(0.5px);
+        background: radial-gradient(circle, rgba(64, 196, 99, 0.45) 0%, rgba(64, 196, 99, 0) 70%);
+        animation: drift 10s ease-in-out infinite;
+        z-index: 1;
+      }
+
+      .orb-1 { top: 120px; right: 12%; }
+      .orb-2 { bottom: 80px; left: 8%; animation-delay: -3s; }
+
+      @keyframes drift {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(12px); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0oRol7G8A-XIK1sUFNwFdiNT3K4BKZ8zn45EWegRnRM8TvXSkKKq5mKihbIWaUFcFax5QCfaFVq1n03_LmYPHZU5_r0OHprheQjGNexqOp9iwL4eIzBUUotAwDx3MiFtEgVdkcs_4Vas-PjaOAxn36NNFZE9q8rUKQnnkI5h6mVG_TDO5tEr-hlWGmVIR/s1536/ico.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" width="600" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg0oRol7G8A-XIK1sUFNwFdiNT3K4BKZ8zn45EWegRnRM8TvXSkKKq5mKihbIWaUFcFax5QCfaFVq1n03_LmYPHZU5_r0OHprheQjGNexqOp9iwL4eIzBUUotAwDx3MiFtEgVdkcs_4Vas-PjaOAxn36NNFZE9q8rUKQnnkI5h6mVG_TDO5tEr-hlWGmVIR/s600/ico.png"/></a></div><div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiA2hSwE6Ag5NXqBiw4y1Djn3hhkkrO06iHsjU43E99H02rhbZDUqpEJ5iTO6f4XQCe6XmFYo2GtYJOBA2W8-iI7iSJNqyZsU5GkyXYxrEtSXga7ZPsUwFvXHYdU2MIp1pyJuAsW2wOZbAeNQH1Vy5NJ6XmBH7VTZPQhXzvAuZR7nLby63tLAKOXYqIhYVS/s1536/logo.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" width="600" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiA2hSwE6Ag5NXqBiw4y1Djn3hhkkrO06iHsjU43E99H02rhbZDUqpEJ5iTO6f4XQCe6XmFYo2GtYJOBA2W8-iI7iSJNqyZsU5GkyXYxrEtSXga7ZPsUwFvXHYdU2MIp1pyJuAsW2wOZbAeNQH1Vy5NJ6XmBH7VTZPQhXzvAuZR7nLby63tLAKOXYqIhYVS/s600/logo.png"/></a></div><div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjoNUpWJd96qqxe6N0aR5cw1NoH2Y9dMKFAoKWZVLa9FxWfFRaonujlG3o55Zkz9fWUddUXFODM2g9l35OPhPEw4gVlaJ7Nc-S94gZKCg4t2YxVKDOV0fO57Spyet77faw5Hy_EztFF_yi3Npy1YDkdHR9fBhyphenhyphenUpAnMLFOFGNdyJSRY7brQSHxMUeZU8blp/s1536/slide1.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" width="600" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjoNUpWJd96qqxe6N0aR5cw1NoH2Y9dMKFAoKWZVLa9FxWfFRaonujlG3o55Zkz9fWUddUXFODM2g9l35OPhPEw4gVlaJ7Nc-S94gZKCg4t2YxVKDOV0fO57Spyet77faw5Hy_EztFF_yi3Npy1YDkdHR9fBhyphenhyphenUpAnMLFOFGNdyJSRY7brQSHxMUeZU8blp/s600/slide1.png"/></a></div><div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUKhhRN2gWGlVk88_78yRhJAmyMQO0ybpQM1nuwKyhG_c9cMEHYX9FVJtEwNJ5T4sQyQaIeczV3CKrj8HJAfVfcKuLVISdNFXII5HtsOZIlJebh0bhaDLrPOkaGMUfd0mdvpSvTA0DL1z9EXplF6oVZDbCsWZMGop-X6lqUQPS2qw3E__PMPR3k63YWPbe/s1536/slide2.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" width="600" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhUKhhRN2gWGlVk88_78yRhJAmyMQO0ybpQM1nuwKyhG_c9cMEHYX9FVJtEwNJ5T4sQyQaIeczV3CKrj8HJAfVfcKuLVISdNFXII5HtsOZIlJebh0bhaDLrPOkaGMUfd0mdvpSvTA0DL1z9EXplF6oVZDbCsWZMGop-X6lqUQPS2qw3E__PMPR3k63YWPbe/s600/slide2.png"/></a></div><div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOswLBws4bVtJA1L6AbHkxzFut7xl5R2fwHFlp7X4-sjTueNLNUsJ10xtTNGO1H5H1kWGw8VLrdKlVnqZcir_jQyuOMxUP7gF6oJnyFykpZu9_AXUcU6dJL_OUYJQEvl22QEQtn0z8jhOB8C0lfIdUAM_-BhuGpM9-KORTQDFOI_TLKyfxYrQFmgqNDvtd/s1536/slide3.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" width="600" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOswLBws4bVtJA1L6AbHkxzFut7xl5R2fwHFlp7X4-sjTueNLNUsJ10xtTNGO1H5H1kWGw8VLrdKlVnqZcir_jQyuOMxUP7gF6oJnyFykpZu9_AXUcU6dJL_OUYJQEvl22QEQtn0z8jhOB8C0lfIdUAM_-BhuGpM9-KORTQDFOI_TLKyfxYrQFmgqNDvtd/s600/slide3.png"/></a></div>
+    <div class="noise"></div>
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+
+    <header>
+      <div class="brand">
+        <div class="brand-badge">P</div>
+        <span>PyDuino • Image Understand</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <h1 class="title">Turn images into answers in seconds.</h1>
+          <p class="subtitle">
+            PyDuino Image Understand is a fast, local-first desktop app that
+            generates **captions, OCR text, and embeddings** with full GUI + CLI
+            control. Download once, run offline, and keep your data on-device.
+          </p>
+          <p class="subtitle">
+            Built for builders and teams who live in screenshots: extract UI text,
+            summarize diagrams, label datasets, and generate clean descriptions
+            you can paste directly into docs or tickets. Everything runs locally,
+            so sensitive images never leave your machine.
+          </p>
+          <p class="subtitle">
+            Choose your model, control prompt length, and decide exactly where
+            outputs are saved. The GUI keeps things friendly while the CLI keeps
+            workflows fast and scriptable.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/pyduinocontact-alt/image-understand/releases/download/v1.0.0/PyDuino-Image-Understand-Setup.exe" target="_blank" rel="noopener">
+              Download PyDuino
+            </a>
+            <button class="btn btn-secondary" id="demo-btn">See what you get</button>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="glass-panel">
+            <strong>What you get</strong>
+            <div class="meter"><span></span></div>
+            <div class="pill-row">
+              <div class="pill">Captions + OCR</div>
+              <div class="pill">Local models</div>
+              <div class="pill">GUI + CLI</div>
+              <div class="pill">Offline-first</div>
+            </div>
+          </div>
+          <div class="glass-panel" id="humor-panel">
+            <strong>Why people download</strong>
+            <div id="humor-line">One click to turn screenshots into searchable text.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-grid">
+        <article class="feature">
+          <h3>Caption & context</h3>
+          <p>Generate short captions or detailed context with custom prompts.</p>
+        </article>
+        <article class="feature">
+          <h3>OCR in one click</h3>
+          <p>Extract text from screenshots, UIs, diagrams, and docs.</p>
+        </article>
+        <article class="feature">
+          <h3>Local-first</h3>
+          <p>Run fully offline with downloaded models. Your data stays local.</p>
+        </article>
+        <article class="feature">
+          <h3>Progress that flows</h3>
+          <p>GUI + terminal logs with smooth progress and no freezing.</p>
+        </article>
+        <article class="feature">
+          <h3>Bring your own model</h3>
+          <p>Use BLIP, CLIP, or your own local model path.</p>
+        </article>
+        <article class="feature">
+          <h3>Download once</h3>
+          <p>Fast multi-threaded downloads with resume support.</p>
+        </article>
+        <article class="feature">
+          <h3>Built for workflows</h3>
+          <p>Great for dataset labeling, screenshots, QA, and docs.</p>
+        </article>
+        <article class="feature">
+          <h3>Windows-friendly</h3>
+          <p>Installer, PATH option, and clear CLI flags.</p>
+        </article>
+      </section>
+      <section class="feature-grid">
+        <article class="feature">
+          <h3>Designed for real workflows</h3>
+          <p>
+            Use it for QA reports, bug reproduction steps, and product feedback.
+            Extract text + context in a single pass, then paste results directly
+            into Jira, Notion, or GitHub issues.
+          </p>
+        </article>
+        <article class="feature">
+          <h3>Fast even on modest hardware</h3>
+          <p>
+            The app is tuned for Windows setups with limited RAM. Download smaller
+            models, reuse caches, and keep performance stable without cloud costs.
+          </p>
+        </article>
+        <article class="feature">
+          <h3>Local, predictable, repeatable</h3>
+          <p>
+            No API keys required. No hidden upload. Your images, your machine,
+            your outputs. Great for sensitive data and offline environments.
+          </p>
+        </article>
+        <article class="feature">
+          <h3>Both GUI and CLI</h3>
+          <p>
+            Use the GUI when exploring or demoing. Use the CLI when automating
+            workflows or batch processing image folders.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      PyDuino Image Understand — fast visual understanding with local control.
+    </footer>
+
+    <script>
+      const lines = [
+        "One click to turn screenshots into searchable text.",
+        "Local-first: no image uploads required.",
+        "Batch-friendly captions for datasets and QA.",
+        "Bring your own model, keep your data local.",
+        "OCR + captions in a single run."
+      ];
+      const el = document.getElementById("humor-line");
+      let idx = 0;
+      document.getElementById("demo-btn").addEventListener("click", () => {
+        idx = (idx + 1) % lines.length;
+        el.textContent = lines[idx];
+      });
+      setInterval(() => {
+        idx = (idx + 1) % lines.length;
+        el.textContent = lines[idx];
+      }, 3500);
+    </script>
+  </body>
+</html>

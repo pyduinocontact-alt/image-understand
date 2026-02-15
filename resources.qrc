@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>slider.json</file>
+        <file>lines.json</file>
+        <file>ico.png</file>
+        <file>logo.png</file>
+    </qresource>
+</RCC>

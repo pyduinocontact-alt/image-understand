@@ -1,0 +1,14 @@
+a close up of a computer screen with a number of items on it
+
+OCR_TEXT:
+Processing Image
+
+Image: test1.png
+
+Loading caption mod:
+
+95%
+
+SHOW MORE DETAILS
+
+Calibrating tiny virtual eyeballs...
